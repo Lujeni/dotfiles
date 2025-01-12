@@ -1,7 +1,0 @@
----
-galaxy_info:
-  author: tchintchin
-  description: gentoo_uwsgi
-  min_ansible_version: 1.9
-
-dependencies: []

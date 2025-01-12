@@ -1,4 +1,0 @@
-# {{ ansible_managed }}
-{% for use in blog_use -%}
-    {{ use }}
-{% endfor %}

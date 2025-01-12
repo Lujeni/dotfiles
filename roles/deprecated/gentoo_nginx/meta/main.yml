@@ -1,7 +1,0 @@
----
-galaxy_info:
-  author: tchintchin
-  description: gentoo_nginx
-  min_ansible_version: 1.8
-
-dependencies: []

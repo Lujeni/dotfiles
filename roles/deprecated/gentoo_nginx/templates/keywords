@@ -1,5 +1,0 @@
-# {{ ansible_managed }}
-
-{% for keywords in nginx_keywords -%}
-	{{ keywords }}
-{% endfor %}

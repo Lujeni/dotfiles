@@ -1,6 +1,0 @@
-- name: "requirements | packages"
-  apt:
-    name: "{{ item }}"
-  loop:
-    - bzip2
-    - curl

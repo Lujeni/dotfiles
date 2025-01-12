@@ -1,4 +1,0 @@
-# {{ ansible_managed }}
-{% for use in nginx_use -%}
-    {{ use }}
-{% endfor %}

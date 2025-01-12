@@ -1,4 +1,0 @@
-# {{ ansible_managed }}
-{% for keyword in uwsgi_keywords -%}
-    {{ keyword }}
-{% endfor %}

@@ -1,4 +1,0 @@
-# {{ ansible_managed }}
-{% for use in uwsgi_use -%}
-    {{ use }} {% if uwsgi_use_php %}php php_targets_php5-5{% endif %}
-{% endfor %}
