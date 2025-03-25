@@ -43,10 +43,7 @@ alias k9s-old="k9s --context k8s-pr-1"
 alias k9s-pa7="k9s --context kubernetes1-pr-pa7"
 
 # kerberos
-alias kerberos-jthe="kinit jthe -kt /home/jthe/works/certificates/keytabs/jthe.keytab -c /tmp/krb5_cache"
+alias kerberos-jthe="kinit jthe -kt /home/jthe/works/certificates/keytabs/jthe.keytab"
 
 # vault
 alias vault-login='vault login -address=https://vault1.numberly.in:8200 -method=ldap username=jthe -format=json'
-
-# vpn
-alias vpn="sudo openvpn /etc/openvpn/jthe.ovpn"
