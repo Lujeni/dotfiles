@@ -1,25 +1,30 @@
 return {
 	"yetone/avante.nvim",
-	lazy = false, -- Load the plugin immediately
-	version = "*", -- Use the latest stable version
+	event = "VeryLazy",
+	version = "*",
 	opts = {
 		provider = "copilot",
+		copilot = {
+			model = "claude-3.7-sonnet",
+		},
+		windows = {
+			position = "right",
+			width = 40,
+		},
 	},
-	-- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
 	build = "make",
 	dependencies = {
 		"nvim-treesitter/nvim-treesitter",
 		"stevearc/dressing.nvim",
 		"nvim-lua/plenary.nvim",
 		"MunifTanjim/nui.nvim",
-		--- The below dependencies are optional,
-		"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-		"zbirenbaum/copilot.lua", -- for providers='copilot'
+		"nvim-tree/nvim-web-devicons",
+		"zbirenbaum/copilot.lua",
 		{
-			-- Make sure to set this up properly if you have lazy=true
 			"MeanderingProgrammer/render-markdown.nvim",
 			opts = {
 				file_types = { "markdown", "Avante" },
+        inline_code = false,
 			},
 			ft = { "markdown", "Avante" },
 		},
