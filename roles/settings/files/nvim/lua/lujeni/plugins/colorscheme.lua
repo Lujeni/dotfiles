@@ -1,13 +1,10 @@
 return {
-  "rebelot/kanagawa.nvim",
+  "folke/tokyonight.nvim",
+  lazy = false,
+  priority = 1000,
+  opts = {},
   config = function()
-    require("kanagawa").setup({
-      compile=true
-    });
     vim.o.termguicolors = true
-    vim.cmd("colorscheme kanagawa");
-  end,
-  build = function()
-    vim.cmd("KanagawaCompile");
+    vim.cmd("colorscheme tokyonight-storm");
   end
 }

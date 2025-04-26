@@ -13,6 +13,7 @@ return {
 			},
 			-- enable indentation
 			indent = { enable = true },
+      sync_install = false,
 			-- ensure these language parsers are installed
 			ensure_installed = {
 				"bash",
@@ -43,10 +44,20 @@ return {
 				"rst",
 				"terraform",
 				"toml",
+				"typescript",
 				"vim",
 				"vimdoc",
 				"xml",
 				"yaml",
+        "comment",
+        "eex",
+        "erlang",
+        "git_config",
+        "git_rebase",
+        "gitcommit",
+        "gitignore",
+        "gleam",
+        "ssh_config",
 			},
 		})
 	end,
