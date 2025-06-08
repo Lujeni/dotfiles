@@ -20,12 +20,10 @@ return {
 		})
 		mason_lspconfig.setup({
 			ensure_installed = {
+				"ansiblels",
 				"bashls",
-				"cssls",
 				"dockerls",
 				"helm_ls",
-				"html",
-				"lua_ls",
 				"nextls",
 				"elixirls",
 				"pyright",

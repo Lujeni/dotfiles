@@ -9,11 +9,11 @@ return {
 		-- configure treesitter
 		treesitter.setup({ -- enable syntax highlighting
 			highlight = {
-				enable = true,
+				enable = false,
 			},
 			-- enable indentation
 			indent = { enable = true },
-      sync_install = false,
+			sync_install = false,
 			-- ensure these language parsers are installed
 			ensure_installed = {
 				"bash",
@@ -49,15 +49,15 @@ return {
 				"vimdoc",
 				"xml",
 				"yaml",
-        "comment",
-        "eex",
-        "erlang",
-        "git_config",
-        "git_rebase",
-        "gitcommit",
-        "gitignore",
-        "gleam",
-        "ssh_config",
+				"comment",
+				"eex",
+				"erlang",
+				"git_config",
+				"git_rebase",
+				"gitcommit",
+				"gitignore",
+				"gleam",
+				"ssh_config",
 			},
 		})
 	end,
