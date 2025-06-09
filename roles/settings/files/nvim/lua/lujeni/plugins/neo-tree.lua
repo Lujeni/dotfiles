@@ -7,13 +7,14 @@ return {
 		"MunifTanjim/nui.nvim",
 	},
 	config = function()
+		require("neo-tree").setup({
+			close_if_last_window = true,
+			window = {
+				position = "bottom",
+			},
+		})
+
 		local keymap = vim.keymap
-		keymap.set("n", "<C-n>", ":Neotree toggle=true position=bottom<CR>", { desc = "Open/Toggle neotree" })
+		keymap.set("n", "<C-n>", ":Neotree toggle=true<CR>", { desc = "Open/Toggle neotree" })
 	end,
-	opts = {
-		close_if_last_window = true, -- Close Neo-tree if it is the last window left in the tab
-		window = {
-			position = "bottom",
-		},
-	},
 }
