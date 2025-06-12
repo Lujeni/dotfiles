@@ -12,6 +12,26 @@ return {
 			window = {
 				position = "bottom",
 			},
+			default_component_configs = {
+				type = { enable = false },
+				size = { enable = false },
+				modified = { enable = false },
+			},
+
+			renderers = {
+				filesystem = {
+					directory = {
+						{ "indent" },
+						{ "icon" },
+						{ "name", trailing_slash = true },
+					},
+					file = {
+						{ "indent" },
+						{ "icon" },
+						{ "name" },
+					},
+				},
+			},
 		})
 
 		local keymap = vim.keymap
