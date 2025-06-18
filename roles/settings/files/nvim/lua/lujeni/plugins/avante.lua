@@ -12,12 +12,12 @@ return {
 		provider = "copilot",
 		providers = {
 			copilot = {
-				endpoint = "https://api.githubcopilot.com",
-				model = "claude-sonnet-4",
+				model = "claude-3.5-sonnet",
 				extra_request_body = {
-					timeout = 30000,
+					timeout = 120000,
 					temperature = 0.75,
-					max_tokens = 2048,
+					max_tokens = 20000,
+					reasoning_effort = "low",
 				},
 			},
 			copilot_completion = {
