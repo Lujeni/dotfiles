@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for lujeni
+
+# User and account configuration
+user: jthe
+group: jthe
+home: /home/jthe
+uuid: 1000
+guid: 1000

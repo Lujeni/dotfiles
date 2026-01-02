@@ -1,0 +1,50 @@
+- name: neovim | check if binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/nvim
+  register: nvim_binary
+
+- name: neovim | download appimage
+  ansible.builtin.get_url:
+    url: https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.appimage
+    dest: /tmp/nvim.appimage
+    mode: "0755"
+    owner: root
+    group: root
+  when: not nvim_binary.stat.exists
+
+- name: neovim | install appimage
+  ansible.builtin.copy:
+    src: /tmp/nvim.appimage
+    dest: /usr/local/bin/nvim
+    mode: "0755"
+    owner: root
+    group: root
+    remote_src: yes
+  when: not nvim_binary.stat.exists
+
+- name: neovim | verify binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/nvim
+  register: nvim_binary_check
+
+- name: neovim | check binary
+  ansible.builtin.assert:
+    that:
+      - nvim_binary_check.stat.exists
+      - nvim_binary_check.stat.isreg
+    fail_msg: "Neovim binary not found or is not a regular file"
+    success_msg: "Neovim binary verified at /usr/local/bin/nvim"
+
+- name: neovim | cleanup temp file
+  ansible.builtin.file:
+    path: /tmp/nvim.appimage
+    state: absent
+  when: not nvim_binary.stat.exists
+
+- name: neovim | copy
+  ansible.builtin.copy:
+    src: files/nvim
+    dest: "{{ home }}/.config/"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"

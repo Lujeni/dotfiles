@@ -1,7 +1,0 @@
----
-- hosts: all
-  gather_facts: yes
-  become: yes
-  become_user: root
-  roles:
-    - settings
