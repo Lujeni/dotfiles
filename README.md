@@ -19,9 +19,15 @@ Tested on:
 
 ## Usage
 
+### Running the Full Playbook
+
+Run the complete playbook to set up your system:
+
 ```bash
-ansible-playbook -i inventory settings.yml
+ansible-playbook -i inventory playbook.yml
 ```
+
+This will execute all tasks defined in the `lujeni` role.
 
 ## Notes
 

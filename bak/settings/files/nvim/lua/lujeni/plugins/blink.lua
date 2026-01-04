@@ -31,7 +31,7 @@ return {
 			},
 		},
 		sources = {
-			default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+			default = { "lazydev", "lsp", "buffer", "path" },
 			providers = {
 				lazydev = {
 					name = "LazyDev",
