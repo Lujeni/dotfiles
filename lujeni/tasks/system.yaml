@@ -1,0 +1,11 @@
+- name: system | create directories
+  ansible.builtin.file:
+    path: "{{ home }}/{{ item }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+  loop:
+    - dl
+    - works/github
+    - works/gitlab

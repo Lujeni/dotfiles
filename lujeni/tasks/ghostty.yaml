@@ -1,0 +1,58 @@
+- name: ghostty | check if binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/ghostty
+  register: ghostty_binary
+
+- name: ghostty | download appimage
+  ansible.builtin.get_url:
+    url: https://github.com/pkgforge-dev/ghostty-appimage/releases/download/v1.2.3/Ghostty-1.2.3-x86_64.AppImage
+    dest: "{{ home }}/dl/ghostty.appimage"
+    mode: "0755"
+    owner: root
+    group: root
+  when: not ghostty_binary.stat.exists
+
+- name: ghostty | install appimage
+  ansible.builtin.copy:
+    src: "{{ home }}/dl/ghostty.appimage"
+    dest: /usr/local/bin/ghostty
+    mode: "0755"
+    owner: root
+    group: root
+    remote_src: yes
+  when: not ghostty_binary.stat.exists
+
+- name: ghostty | verify binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/ghostty
+  register: ghostty_binary_check
+
+- name: ghostty | check binary
+  ansible.builtin.assert:
+    that:
+      - ghostty_binary_check.stat.exists
+      - ghostty_binary_check.stat.isreg
+    fail_msg: "Ghostty binary not found or is not a regular file"
+    success_msg: "Ghostty binary verified at /usr/local/bin/ghostty"
+
+- name: ghostty | cleanup temp file
+  ansible.builtin.file:
+    path: "{{ home }}/dl/ghostty.appimage"
+    state: absent
+  when: not ghostty_binary.stat.exists
+
+- name: ghostty | create config directory
+  ansible.builtin.file:
+    path: "{{ home }}/.config/ghostty"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: ghostty | deploy config
+  ansible.builtin.template:
+    src: templates/ghostty/config.j2
+    dest: "{{ home }}/.config/ghostty/config"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
