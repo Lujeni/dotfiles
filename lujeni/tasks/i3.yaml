@@ -1,0 +1,45 @@
+---
+- name: i3 | check if installed
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: i3 | install required packages
+  ansible.builtin.apt:
+    name:
+      - i3
+      - py3status
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  notify: restart i3
+
+- name: i3 | ensure configuration directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner | default(user) }}"
+    group: "{{ item.group | default(group) }}"
+    mode: "{{ item.mode | default('0755') }}"
+    state: directory
+  loop:
+    - path: "{{ home }}/.config/i3"
+      owner: "{{ user }}"
+      group: "{{ group }}"
+      mode: "0755"
+    - path: "/etc/py3status.d"
+      owner: "root"
+      group: "{{ group }}"
+      mode: "0755"
+
+- name: i3 | deploy configuration files
+  ansible.builtin.template:
+    src: "templates/i3/{{ item }}.j2"
+    dest: "{{ home }}/.config/i3/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+    backup: yes
+    validate: "i3 -C -c %s"
+  loop:
+    - config
+    - i3status.conf
+  notify: reload i3

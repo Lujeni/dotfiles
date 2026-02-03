@@ -9,3 +9,6 @@
 
 - name: Include ghostty tasks
   ansible.builtin.import_tasks: ghostty.yaml
+
+- name: Include i3 tasks
+  ansible.builtin.import_tasks: i3.yaml
