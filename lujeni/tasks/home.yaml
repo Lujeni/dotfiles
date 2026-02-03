@@ -1,0 +1,57 @@
+---
+- name: home | install packages
+  ansible.builtin.apt:
+    name:
+      - bat
+      - eza
+      - feh
+      - jq
+      - ripgrep
+      - scrot
+      - tmux
+      - tmuxp
+      - tree
+      - unp
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: home | deploy dotfiles
+  ansible.builtin.template:
+    src: "templates/dotfile/{{ item.src }}"
+    dest: "{{ home }}/{{ item.dest }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+  loop:
+    - { src: "bashrc.j2", dest: ".bashrc" }
+    - { src: "bash_aliases.j2", dest: ".bash_aliases" }
+    - { src: "exports.j2", dest: ".exports" }
+    - { src: "gitconfig.j2", dest: ".gitconfig" }
+    - { src: "gitconfig-github.j2", dest: ".gitconfig-github" }
+    - { src: "gitconfig-gitlab.j2", dest: ".gitconfig-gitlab" }
+    - { src: "gitignore_global.j2", dest: ".gitignore_global" }
+    - { src: "tmux.conf.j2", dest: ".tmux.conf" }
+
+- name: home | clone tmux plugin manager
+  ansible.builtin.git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ home }}/.tmux/plugins/tpm"
+    depth: 1
+  become: yes
+  become_user: "{{ user }}"
+
+- name: home | clone nerd-fonts
+  ansible.builtin.git:
+    repo: https://github.com/ryanoasis/nerd-fonts.git
+    dest: "{{ home }}/nerd-fonts"
+    depth: 1
+  become: yes
+  become_user: "{{ user }}"
+
+- name: home | install nerd-fonts
+  ansible.builtin.command:
+    cmd: "{{ home }}/nerd-fonts/install.sh JetBrainsMono"
+    creates: "{{ home }}/.local/share/fonts/JetBrainsMonoNerdFont-Regular.ttf"
+  become: yes
+  become_user: "{{ user }}"

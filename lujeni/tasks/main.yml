@@ -12,3 +12,6 @@
 
 - name: Include i3 tasks
   ansible.builtin.import_tasks: i3.yaml
+
+- name: Include home tasks
+  ansible.builtin.import_tasks: home.yaml

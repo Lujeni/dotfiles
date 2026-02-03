@@ -1,0 +1,43 @@
+# {{ ansible_managed }}
+[core]
+    excludesfile = ~/.gitignore_global
+    editor = nvim
+
+[includeIf "hasconfig:remote.*.url:git@gitlab.*:*/**"]
+    path = .gitconfig-gitlab
+
+[includeIf "hasconfig:remote.*.url:git@github.com:*/**"]
+    path = .gitconfig-github
+
+[color]
+    branch = auto
+    diff = auto
+    status = auto
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red
+    new = green
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
+
+[push]
+    default = matching
+
+[branch]
+    sort = -committerdate
+
+[column]
+    ui = auto
+
+[pull]
+    rebase = true
