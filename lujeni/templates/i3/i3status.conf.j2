@@ -10,35 +10,17 @@ general {
     output_format = "i3bar"
 }
 
-order += "disk /"
-order += "memory"
-order += "cpu_usage"
+order += "bluetooth"
+order += "xrandr"
 order += "battery 0"
-order += "tztime local"
 
-disk "/" {
-    format = "  %avail"
+bluetooth {
+    format = "BT: {format_device}"
+    format_device = "{name}"
 }
 
-memory {
-    format = "  %used"
-    threshold_degraded = "10%"
-    threshold_critical = "5%"
-}
-
-cpu_usage {
-    format = "  %usage"
-}
-
-battery 0 {
-    format = "%status %percentage %remaining"
-    format_down = ""
-    status_chr = " "
-    status_bat = " "
-    status_full = " "
-    low_threshold = 20
-}
-
-tztime local {
-    format = "  %Y-%m-%d %H:%M"
+xrandr {
+    cache_timeout = 5
+    fallback = true
+    force_on_change = ["DP1", "eDP1"]
 }

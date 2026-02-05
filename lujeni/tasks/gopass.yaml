@@ -1,0 +1,18 @@
+---
+- name: gopass | check if gopass binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/gopass
+  register: gopass_binary
+
+- name: gopass | download gopass deb
+  ansible.builtin.get_url:
+    url: https://github.com/gopasspw/gopass/releases/download/v1.15.14/gopass_1.15.14_linux_amd64.deb
+    dest: /tmp/gopass.deb
+    mode: "0644"
+  when: not gopass_binary.stat.exists
+
+- name: gopass | install gopass
+  ansible.builtin.apt:
+    deb: /tmp/gopass.deb
+    state: present
+  when: not gopass_binary.stat.exists

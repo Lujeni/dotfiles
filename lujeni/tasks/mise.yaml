@@ -1,0 +1,40 @@
+- name: mise | download apt signing key
+  ansible.builtin.get_url:
+    url: https://mise.jdx.dev/gpg-key.pub
+    dest: /etc/apt/keyrings/mise-archive-keyring.asc
+    mode: "0644"
+
+- name: mise | add apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.asc] https://mise.jdx.dev/deb stable main"
+    filename: mise
+    state: present
+
+- name: mise | install mise
+  ansible.builtin.apt:
+    name: mise
+    state: present
+    update_cache: yes
+
+- name: mise | ensure config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.config/mise"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: mise | deploy config
+  ansible.builtin.template:
+    src: mise/config.toml.j2
+    dest: "{{ home }}/.config/mise/config.toml"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+  register: mise_config
+
+- name: mise | install tools
+  ansible.builtin.command: mise install
+  become: true
+  become_user: "{{ user }}"
+  when: mise_config.changed

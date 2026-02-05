@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+FROM debian:stable-slim
+
+RUN apt-get update && apt-get install -y git gpg scdaemon curl
+COPY gpg.pub .
+RUN cat gpg.pub | gpg --import -
+COPY bashrc /root/.bashrc
+
+ENTRYPOINT ["bash"]

@@ -8,3 +8,8 @@ group: jthe
 home: /home/jthe
 uuid: 1000
 guid: 1000
+trigramme: jthe
+
+# Docker
+docker_repo_prefix: lujeni
+docker_images_version: 1.0.0

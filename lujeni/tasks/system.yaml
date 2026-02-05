@@ -1,3 +1,17 @@
+- name: system | install base packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - python3.12-venv
+      - bluez
+      - pavucontrol
+      - postgresql-client
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
 - name: system | create directories
   ansible.builtin.file:
     path: "{{ home }}/{{ item }}"
@@ -9,3 +23,26 @@
     - dl
     - works/github
     - works/gitlab
+    - system-venv
+
+- name: system | create cz venv
+  ansible.builtin.command:
+    cmd: python3 -m venv {{ home }}/system-venv/cz
+    creates: "{{ home }}/system-venv/cz/bin/activate"
+  become: true
+  become_user: "{{ user }}"
+
+- name: system | install commitizen in cz venv
+  ansible.builtin.pip:
+    name: commitizen
+    state: latest
+    virtualenv: "{{ home }}/system-venv/cz"
+  become: true
+  become_user: "{{ user }}"
+
+- name: system | create lamactl venv
+  ansible.builtin.command:
+    cmd: python3 -m venv {{ home }}/system-venv/lamactl
+    creates: "{{ home }}/system-venv/lamactl/bin/activate"
+  become: true
+  become_user: "{{ user }}"

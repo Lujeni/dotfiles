@@ -1,0 +1,54 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: firefox | check if firefox binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/firefox
+  register: firefox_binary
+
+- name: firefox | install from mozilla repository
+  when: not firefox_binary.stat.exists
+  block:
+    - name: firefox | remove old mozilla sources
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/apt/sources.list.d/mozilla.list
+        - /etc/apt/keyrings/packages.mozilla.org.gpg
+        - /etc/apt/keyrings/packages.mozilla.org.asc
+
+    - name: firefox | download mozilla apt signing key
+      ansible.builtin.get_url:
+        url: https://packages.mozilla.org/apt/repo-signing-key.gpg
+        dest: /etc/apt/keyrings/packages.mozilla.org.asc
+        mode: "0644"
+
+    - name: firefox | add mozilla apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main"
+        filename: mozilla
+        state: present
+
+    - name: firefox | configure apt preferences for mozilla repository
+      ansible.builtin.copy:
+        dest: /etc/apt/preferences.d/mozilla
+        content: |
+          Package: *
+          Pin: origin packages.mozilla.org
+          Pin-Priority: 1000
+        mode: "0644"
+
+    - name: firefox | remove snap firefox
+      ansible.builtin.snap:
+        name: firefox
+        state: absent
+      ignore_errors: true
+
+    - name: firefox | update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: firefox | install firefox from mozilla repository
+      ansible.builtin.apt:
+        name: firefox
+        state: present

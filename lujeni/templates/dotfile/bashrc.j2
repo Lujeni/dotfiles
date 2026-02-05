@@ -3,31 +3,30 @@ if [[ $- != *i* ]] ; then
     return
 fi
 
-for file in exports bash_aliases; do
+# Fix ghostty terminal
+if [[ "$TERM" == "xterm-ghostty" ]]; then
+  export TERM=xterm-256color
+fi
+
+for file in exports bash_aliases dockerfunc; do
     [ -f "$HOME/.$file" ] && source "$HOME/.$file"
 done
 unset file
 
-# go
-export PATH=$PATH:/usr/local/go/bin
-
 # python
 export PYTHONWARNINGS=once
 
-# pyenv
-if [ -d "$HOME/.pyenv" ]; then
-    export PYENV_ROOT="$HOME/.pyenv"
-    command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
-fi
+# local bin
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
-# rust
-[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+# commitizen
+alias cz="$HOME/system-venv/cz/bin/cz"
 
-# starship
-command -v starship >/dev/null && eval "$(starship init bash)"
+# lamactl
+alias lamactl="$HOME/system-venv/lamactl/bin/lamactl"
 
-# asdf
-[ -f "$HOME/.asdf/asdf.sh" ] && source "$HOME/.asdf/asdf.sh"
-[ -f "$HOME/.asdf/completions/asdf.bash" ] && source "$HOME/.asdf/completions/asdf.bash"
+# oh-my-posh prompt
+eval "$(oh-my-posh init bash --config ~/.config/ohmyposh.omp.json)"
+
+# mise
+eval "$(mise activate bash)"

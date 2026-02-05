@@ -1,0 +1,45 @@
+---
+- name: kubectl | check if kubectl binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_binary
+
+- name: kubectl | install
+  when: not kubectl_binary.stat.exists
+  block:
+    - name: kubectl | ensure keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: kubectl | download and dearmor kubernetes apt signing key
+      ansible.builtin.shell:
+        cmd: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    - name: kubectl | set keyring permissions
+      ansible.builtin.file:
+        path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        mode: "0644"
+
+    - name: kubectl | add kubernetes apt repository
+      ansible.builtin.copy:
+        content: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.35/deb/ /"
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        mode: "0644"
+
+    - name: kubectl | update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: kubectl | install kubectl
+      ansible.builtin.apt:
+        name: kubectl
+        state: present
+
+- name: kubectl | install kubectx and kubens
+  ansible.builtin.apt:
+    name: kubectx
+    state: present
+  when: not kubectl_binary.stat.exists

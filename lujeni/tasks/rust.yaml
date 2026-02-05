@@ -1,0 +1,15 @@
+---
+- name: rust | install rustup
+  ansible.builtin.shell: |
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+  args:
+    creates: "{{ home }}/.cargo/bin/rustup"
+  become: no
+  become_user: "{{ user }}"
+
+- name: rust | ensure stable toolchain is installed
+  ansible.builtin.shell: |
+    {{ home }}/.cargo/bin/rustup default stable
+  become: no
+  become_user: "{{ user }}"
+  changed_when: false

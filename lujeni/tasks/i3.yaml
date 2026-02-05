@@ -1,3 +1,4 @@
+#SPDX-License-Identifier: MIT-0
 ---
 - name: i3 | check if installed
   ansible.builtin.package_facts:
@@ -30,16 +31,23 @@
       group: "{{ group }}"
       mode: "0755"
 
-- name: i3 | deploy configuration files
+- name: i3 | deploy i3 config
   ansible.builtin.template:
-    src: "templates/i3/{{ item }}.j2"
-    dest: "{{ home }}/.config/i3/{{ item }}"
+    src: "templates/i3/config.j2"
+    dest: "{{ home }}/.config/i3/config"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: "0644"
     backup: yes
     validate: "i3 -C -c %s"
-  loop:
-    - config
-    - i3status.conf
+  notify: reload i3
+
+- name: i3 | deploy i3status config
+  ansible.builtin.template:
+    src: "templates/i3/i3status.conf.j2"
+    dest: "{{ home }}/.config/i3/i3status.conf"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+    backup: yes
   notify: reload i3

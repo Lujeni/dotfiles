@@ -1,0 +1,108 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Bash wrappers for docker run commands
+# based on https://github.com/jessfraz/dotfiles
+
+export DOCKER_REPO_PREFIX="{{ docker_repo_prefix }}"
+
+dcleanup(){
+	local containers
+	mapfile -t containers < <(docker ps -aq 2>/dev/null)
+	docker rm "${containers[@]}" 2>/dev/null
+	local volumes
+	mapfile -t volumes < <(docker ps --filter status=exited -q 2>/dev/null)
+	docker rm -v "${volumes[@]}" 2>/dev/null
+	local images
+	mapfile -t images < <(docker images --filter dangling=true -q 2>/dev/null)
+	docker rmi "${images[@]}" 2>/dev/null
+}
+
+del_stopped(){
+	local name=$1
+	local state
+	state=$(docker inspect --format {% raw %}"{{.State.Running}}"{% endraw %} "$name" 2>/dev/null)
+
+	if [[ "$state" == "false" ]]; then
+		docker rm "$name"
+	fi
+}
+
+chrome(){
+    del_stopped chrome
+    docker run -d \
+        --name chrome \
+        --device /dev/dri \
+        --device /dev/dri \
+        --device /dev/snd \
+        --device /dev/snd \
+        --device /dev/video0 \
+        --group-add audio \
+        --group-add video \
+        --memory 2gb \
+        --name chrome \
+        --security-opt seccomp:/etc/docker/seccomp-chrome.json \
+        -e "DISPLAY=unix${DISPLAY}" \
+        -v "${HOME}/docker/data/chrome/data:/home/chrome/data" \
+        -v "${HOME}/docker/data/chrome/downloads:/home/chrome/Downloads" \
+        -v "${HOME}/.aws:/home/chrome/.aws" \
+        -v /dev/shm:/dev/shm \
+        -v /etc/hosts:/etc/hosts \
+        -v /etc/localtime:/etc/localtime:ro \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        ${DOCKER_REPO_PREFIX}/chrome:{{ docker_images_version }} --user-data-dir=/home/chrome/data
+}
+
+
+compass(){
+    del_stopped compass
+    docker run -d \
+            --name compass \
+            --net host \
+            -e "DISPLAY=unix${DISPLAY}" \
+            -e GDK_DPI_SCALE \
+            -e GDK_SCALE \
+            -v "${HOME}/docker/data/compass:/home/{{ user }}/.config/" \
+            -v /etc/localtime:/etc/localtime:ro \
+            -v /tmp/.X11-unix:/tmp/.X11-unix \
+            ${DOCKER_REPO_PREFIX}/compass:1.0.0
+}
+
+dmongo(){
+    del_stopped dmongo
+    docker run -it \
+        -p 27017:27017 \
+        --net host \
+        mongo
+}
+
+dmemcached(){
+    del_stopped dmemcached
+    docker run -it \
+        -p 11211:11211 \
+        --net host \
+        memcached
+}
+
+dmssql(){
+    del_stopped dmssql
+    docker run -it --rm \
+        --name python_mssql \
+        --net host \
+        -v "$(pwd):/usr/src/repo" \
+        -v "/etc/odbc.ini:/etc/odbc.ini" \
+        -v "/etc/krb5.conf:/etc/krb5.conf" \
+        -v "/tmp/krb5_cache:/tmp/krb5cc_0" \
+        --workdir /usr/src/repo \
+        --log-driver none \
+        ${DOCKER_REPO_PREFIX}/python-mssql:{{ docker_images_version }} bash
+}
+
+dpgsql-11(){
+    del_stopped dpgsql_11
+    docker run -it \
+        -p 5432:5432 \
+        --net host \
+        --name dpgsql_11 \
+        -e POSTGRES_PASSWORD=mysecretpassword \
+        postgres:11.19-alpine
+}
