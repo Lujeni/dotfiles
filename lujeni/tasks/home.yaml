@@ -1,4 +1,28 @@
 ---
+- name: home | ensure ssh directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.ssh"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0700"
+
+- name: home | ensure certificates directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/certificates"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0700"
+
+- name: home | deploy ssh config
+  ansible.builtin.template:
+    src: "templates/dotfile/ssh_config.j2"
+    dest: "{{ home }}/.ssh/config"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0600"
+
 - name: home | install packages
   ansible.builtin.apt:
     name:
@@ -16,6 +40,22 @@
     update_cache: yes
     cache_valid_time: 3600
 
+- name: home | ensure ghorg config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.config/ghorg"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: home | deploy ghorgignore
+  ansible.builtin.template:
+    src: "templates/ghorg/ghorgignore.j2"
+    dest: "{{ home }}/.config/ghorg/ghorgignore"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+
 - name: home | deploy dotfiles
   ansible.builtin.template:
     src: "templates/dotfile/{{ item.src }}"
@@ -32,6 +72,50 @@
     - { src: "gitconfig-gitlab.j2", dest: ".gitconfig-gitlab" }
     - { src: "gitignore_global.j2", dest: ".gitignore_global" }
     - { src: "tmux.conf.j2", dest: ".tmux.conf" }
+    - { src: "dockerfunc.j2", dest: ".dockerfunc" }
+
+- name: home | retrieve gitlab api token from gopass
+  ansible.builtin.command:
+    cmd: gopass show -o numberly/gitlab-api-token
+  become: true
+  become_user: "{{ user }}"
+  register: gitlab_token
+  changed_when: false
+
+- name: home | deploy netrc
+  ansible.builtin.template:
+    src: "templates/dotfile/netrc.j2"
+    dest: "{{ home }}/.netrc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0600"
+  vars:
+    gitlab_api_token: "{{ gitlab_token.stdout }}"
+
+- name: home | deploy npmrc
+  ansible.builtin.template:
+    src: "templates/dotfile/npmrc.j2"
+    dest: "{{ home }}/.npmrc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0600"
+  vars:
+    gitlab_api_token: "{{ gitlab_token.stdout }}"
+
+- name: home | install oh-my-posh
+  ansible.builtin.shell:
+    cmd: curl -s https://ohmyposh.dev/install.sh | bash -s -- -d {{ home }}/.local/bin
+    creates: "{{ home }}/.local/bin/oh-my-posh"
+  become: yes
+  become_user: "{{ user }}"
+
+- name: home | deploy oh-my-posh config
+  ansible.builtin.copy:
+    src: "files/ohmyposh.omp.json"
+    dest: "{{ home }}/.config/ohmyposh.omp.json"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
 
 - name: home | clone tmux plugin manager
   ansible.builtin.git:

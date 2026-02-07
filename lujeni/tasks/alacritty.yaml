@@ -1,0 +1,25 @@
+- name: alacritty | add ppa
+  ansible.builtin.apt_repository:
+    repo: ppa:aslatter/ppa
+
+- name: alacritty | install
+  ansible.builtin.apt:
+    name: alacritty
+    state: present
+    update_cache: yes
+
+- name: alacritty | create config directory
+  ansible.builtin.file:
+    path: "{{ home }}/.config/alacritty"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: alacritty | deploy config
+  ansible.builtin.template:
+    src: alacritty/alacritty.toml.j2
+    dest: "{{ home }}/.config/alacritty/alacritty.toml"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"

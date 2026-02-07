@@ -3,15 +3,52 @@
 # tasks file for lujeni
 - name: Include system tasks
   ansible.builtin.import_tasks: system.yaml
+  tags: [system]
 
 - name: Include neovim tasks
   ansible.builtin.import_tasks: neovim.yaml
+  tags: [neovim]
 
-- name: Include ghostty tasks
-  ansible.builtin.import_tasks: ghostty.yaml
+- name: Include alacritty tasks
+  ansible.builtin.import_tasks: alacritty.yaml
+  tags: [alacritty]
 
 - name: Include i3 tasks
   ansible.builtin.import_tasks: i3.yaml
+  tags: [i3]
+
+- name: Include firefox tasks
+  ansible.builtin.import_tasks: firefox.yaml
+  tags: [firefox]
+
+- name: Include docker tasks
+  ansible.builtin.import_tasks: docker.yaml
+  tags: [docker]
+
+- name: Include gopass tasks
+  ansible.builtin.import_tasks: gopass.yaml
+  tags: [gopass]
+
+- name: Include nodejs tasks
+  ansible.builtin.import_tasks: nodejs.yaml
+  tags: [nodejs]
+
+- name: Include kubectl tasks
+  ansible.builtin.import_tasks: kubectl.yaml
+  tags: [kubectl]
+
+- name: Include mise tasks
+  ansible.builtin.import_tasks: mise.yaml
+  tags: [mise]
+
+- name: Include rust tasks
+  ansible.builtin.import_tasks: rust.yaml
+  tags: [rust]
+
+- name: Include yubikey tasks
+  ansible.builtin.import_tasks: yubikey.yaml
+  tags: [yubikey]
 
 - name: Include home tasks
   ansible.builtin.import_tasks: home.yaml
+  tags: [home]

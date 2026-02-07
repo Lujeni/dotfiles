@@ -1,0 +1,55 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: docker | check if docker binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/docker
+  register: docker_binary
+
+- name: docker | ensure keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when: not docker_binary.stat.exists
+
+- name: docker | download docker apt signing key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+  when: not docker_binary.stat.exists
+
+- name: docker | add docker apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+  when: not docker_binary.stat.exists
+
+- name: docker | install docker packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  when: not docker_binary.stat.exists
+
+- name: docker | deploy daemon.json
+  ansible.builtin.template:
+    src: docker/daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart docker
+
+- name: docker | add user to docker group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: docker
+    append: yes
+

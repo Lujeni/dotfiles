@@ -13,7 +13,7 @@ font pango:JetBrainsMono Nerd Font 10
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec ghostty
+bindsym $mod+Return exec alacritty
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -132,6 +132,9 @@ bar {
     position top
     status_command py3status -c ~/.config/i3/i3status.conf
 }
+
+# autostart
+exec --no-startup-id nm-applet
 
 focus_follows_mouse no
 new_window 1pixel
