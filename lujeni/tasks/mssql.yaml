@@ -1,0 +1,38 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: mssql | check if odbc driver is installed
+  ansible.builtin.stat:
+    path: /opt/microsoft/msodbcsql18
+  register: msodbcsql_dir
+
+- name: mssql | ensure keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when: not msodbcsql_dir.stat.exists
+
+- name: mssql | download microsoft apt signing key
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /etc/apt/keyrings/microsoft.asc
+    mode: "0644"
+  when: not msodbcsql_dir.stat.exists
+
+- name: mssql | add microsoft apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.asc] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
+    filename: mssql-release
+    state: present
+  when: not msodbcsql_dir.stat.exists
+
+- name: mssql | install odbc driver packages
+  ansible.builtin.apt:
+    name:
+      - msodbcsql18
+      - unixodbc-dev
+    state: present
+    update_cache: yes
+  environment:
+    ACCEPT_EULA: "Y"
+  when: not msodbcsql_dir.stat.exists
