@@ -1,0 +1,9 @@
+---
+- name: helm | install helm-secrets plugin
+  ansible.builtin.command:
+    cmd: helm plugin install https://github.com/jkroepke/helm-secrets --version 3.15.0
+  become: true
+  become_user: "{{ user }}"
+  register: helm_secrets_plugin
+  changed_when: helm_secrets_plugin.rc == 0
+  failed_when: helm_secrets_plugin.rc != 0 and 'already exists' not in helm_secrets_plugin.stderr

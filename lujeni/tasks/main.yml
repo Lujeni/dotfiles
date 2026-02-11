@@ -49,6 +49,10 @@
   ansible.builtin.import_tasks: yubikey.yaml
   tags: [yubikey]
 
+- name: Include helm tasks
+  ansible.builtin.import_tasks: helm.yaml
+  tags: [helm]
+
 - name: Include mssql tasks
   ansible.builtin.import_tasks: mssql.yaml
   tags: [mssql]
