@@ -30,6 +30,7 @@
   ansible.builtin.apt:
     name:
       - msodbcsql18
+      - mssql-tools18
       - unixodbc-dev
     state: present
     update_cache: yes
