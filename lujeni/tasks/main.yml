@@ -53,6 +53,10 @@
   ansible.builtin.import_tasks: helm.yaml
   tags: [helm]
 
+- name: Include gh tasks
+  ansible.builtin.import_tasks: gh.yaml
+  tags: [gh]
+
 - name: Include mssql tasks
   ansible.builtin.import_tasks: mssql.yaml
   tags: [mssql]

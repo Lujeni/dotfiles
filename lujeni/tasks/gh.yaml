@@ -1,0 +1,35 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: gh | check if gh binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/gh
+  register: gh_binary
+
+- name: gh | ensure keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when: not gh_binary.stat.exists
+
+- name: gh | download github cli apt signing key
+  ansible.builtin.get_url:
+    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: "0644"
+  when: not gh_binary.stat.exists
+
+- name: gh | add github cli apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture | regex_replace('x86_64', 'amd64') }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    filename: github-cli
+    state: present
+  when: not gh_binary.stat.exists
+
+- name: gh | install gh package
+  ansible.builtin.apt:
+    name:
+      - gh
+    state: present
+    update_cache: yes
+  when: not gh_binary.stat.exists
