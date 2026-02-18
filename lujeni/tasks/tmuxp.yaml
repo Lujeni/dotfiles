@@ -1,0 +1,39 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: tmuxp | ensure tmuxp config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.config/tmuxp"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: tmuxp | read base directories
+  ansible.builtin.set_fact:
+    tmuxp_base_dirs: "{{ lookup('file', 'files/tmuxp/projects.list').splitlines() | reject('match', '^\\s*$') | reject('match', '^#') | map('regex_replace', '^~', home) | list }}"
+
+- name: tmuxp | discover and deploy all project configs
+  ansible.builtin.shell: |
+    for base_dir in {{ tmuxp_base_dirs | join(' ') }}; do
+      [ -d "$base_dir" ] || continue
+      find "$base_dir" -type d -name .git | while read gitdir; do
+        project=$(dirname "$gitdir")
+        name=$(basename "$project")
+        cat > "{{ home }}/.config/tmuxp/${name}.yaml" <<EOF
+    session_name: ${name}
+    start_directory: ${project}
+    windows:
+      - window_name: editor
+        panes:
+          - shell_command:
+              - nvim
+      - window_name: terminal
+        panes:
+          - shell_command: []
+          - shell_command: []
+    EOF
+        chown {{ user }}:{{ group }} "{{ home }}/.config/tmuxp/${name}.yaml"
+      done
+    done
+  args:
+    executable: /bin/bash

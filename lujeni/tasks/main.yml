@@ -61,6 +61,10 @@
   ansible.builtin.import_tasks: mssql.yaml
   tags: [mssql]
 
+- name: Include tmuxp tasks
+  ansible.builtin.import_tasks: tmuxp.yaml
+  tags: [tmuxp]
+
 - name: Include home tasks
   ansible.builtin.import_tasks: home.yaml
   tags: [home]
