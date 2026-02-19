@@ -15,6 +15,9 @@ return {
 					theme = "dropdown",
 					hidden = true,
 				},
+				live_grep = {
+					additional_args = { "--hidden" },
+				},
 			},
 			defaults = {
 				path_display = { "smart" },
