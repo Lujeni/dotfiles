@@ -13,8 +13,9 @@ alias cat='batcat'
 alias more='batcat'
 
 # ghorg
-alias sync-gh-lujeni='GHORG_GITHUB_TOKEN=$(gopass show -o github/api-token-ghorg) ghorg clone Lujeni --clone-type=user --protocol=ssh --concurrency=10 --skip-archived--path=$HOME/works/github'
-alias sync-gh-numberly='GHORG_GITHUB_TOKEN=$(gopass show -o github/api-token-ghorg) ghorg clone Numberly --clone-type=org --protocol=ssh --concurrency=10 --skip-archived--path=$HOME/works/github'
+alias sync-gh-lujeni='GHORG_GITHUB_TOKEN=$(gopass show -o github/api-token-ghorg) ghorg clone Lujeni --clone-type=user --protocol=ssh --concurrency=10 --skip-archived --path=$HOME/works/github'
+alias sync-gh-numberly='GHORG_GITHUB_TOKEN=$(gopass show -o github/api-token-ghorg) ghorg clone Numberly --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --path=$HOME/works/github'
+alias sync-gh-gobmacro='GHORG_GITHUB_TOKEN=$(gopass show -o github/api-token-ghorg) ghorg clone gobmacro --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --path=$HOME/works/github'
 alias sync-gl-team-dmp='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/gitlab-api-token) ghorg clone team-dmp --scm=gitlab --base-url=https://gitlab.numberly.in --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --preserve-dir --path=$HOME/works/gitlab'
 alias sync-gl-guild-backend='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/gitlab-api-token) ghorg clone guild-backend --scm=gitlab --base-url=https://gitlab.numberly.in --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --preserve-dir --path=$HOME/works/gitlab'
 alias sync-gl-team-ocd='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/gitlab-api-token) ghorg clone team-omnichannel-delivery --scm=gitlab --base-url=https://gitlab.numberly.in --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --preserve-dir --path=$HOME/works/gitlab'
@@ -23,7 +24,7 @@ alias sync-gl-team-crm-automation='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/
 alias sync-gl-team-emailing='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/gitlab-api-token) ghorg clone team-emailing --scm=gitlab --base-url=https://gitlab.numberly.in --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --preserve-dir --path=$HOME/works/gitlab'
 alias sync-gl-team-security='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/gitlab-api-token) ghorg clone team-security --scm=gitlab --base-url=https://gitlab.numberly.in --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --preserve-dir --path=$HOME/works/gitlab'
 alias sync-gl-team-uep='GHORG_GITLAB_TOKEN=$(gopass show -o numberly/gitlab-api-token) ghorg clone team-uep --scm=gitlab --base-url=https://gitlab.numberly.in --clone-type=org --protocol=ssh --concurrency=10 --skip-archived --preserve-dir --path=$HOME/works/gitlab'
-alias sync-global='sync-gh-lujeni && sync-gh-numberly && sync-gl-team-dmp && sync-gl-guild-backend && sync-gl-team-ocd && sync-gl-team-infrastructure && sync-gl-team-crm-automation && sync-gl-team-emailing && sync-gl-team-security && sync-gl-team-uep'
+alias sync-global='sync-gh-lujeni && sync-gh-numberly && sync-gh-gobmacro && sync-gl-team-dmp && sync-gl-guild-backend && sync-gl-team-ocd && sync-gl-team-infrastructure && sync-gl-team-crm-automation && sync-gl-team-emailing && sync-gl-team-security && sync-gl-team-uep'
 
 # kerberos
 alias keytab='printf "add_entry -password -p jthe -k 1 -e aes256-cts-hmac-sha1-96\n%s\nwkt $HOME/certificates/jthe.keytab\nquit\n" "$(gopass show -o numberly/ldap)" | ktutil'
