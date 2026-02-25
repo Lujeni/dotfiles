@@ -65,6 +65,10 @@
   ansible.builtin.import_tasks: tmuxp.yaml
   tags: [tmuxp]
 
+- name: Include azure-cli tasks
+  ansible.builtin.import_tasks: azure-cli.yaml
+  tags: [azure-cli]
+
 - name: Include home tasks
   ansible.builtin.import_tasks: home.yaml
   tags: [home]

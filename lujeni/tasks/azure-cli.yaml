@@ -1,0 +1,54 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: azure-cli | check if az binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/az
+  register: az_binary
+
+- name: azure-cli | install required packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: yes
+  when: not az_binary.stat.exists
+
+- name: azure-cli | ensure keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when: not az_binary.stat.exists
+
+- name: azure-cli | download microsoft apt signing key
+  ansible.builtin.shell: |
+    curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null
+    chmod go+r /etc/apt/keyrings/microsoft.gpg
+  args:
+    creates: /etc/apt/keyrings/microsoft.gpg
+  when: not az_binary.stat.exists
+
+- name: azure-cli | add azure-cli apt repository
+  ansible.builtin.shell: |
+    AZ_DIST=$(lsb_release -cs)
+    echo "Types: deb
+    URIs: https://packages.microsoft.com/repos/azure-cli/
+    Suites: ${AZ_DIST}
+    Components: main
+    Architectures: $(dpkg --print-architecture)
+    Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources
+  args:
+    creates: /etc/apt/sources.list.d/azure-cli.sources
+  when: not az_binary.stat.exists
+
+- name: azure-cli | install azure-cli package
+  ansible.builtin.apt:
+    name:
+      - azure-cli
+    state: present
+    update_cache: yes
+  when: not az_binary.stat.exists
