@@ -69,6 +69,10 @@
   ansible.builtin.import_tasks: azure-cli.yaml
   tags: [azure-cli]
 
+- name: Include posting tasks
+  ansible.builtin.import_tasks: posting.yaml
+  tags: [posting]
+
 - name: Include home tasks
   ansible.builtin.import_tasks: home.yaml
   tags: [home]

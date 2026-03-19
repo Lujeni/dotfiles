@@ -1,0 +1,13 @@
+- name: posting | install uv
+  ansible.builtin.shell:
+    cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+    creates: "{{ home }}/.local/bin/uv"
+  become: true
+  become_user: "{{ user }}"
+
+- name: posting | install posting via uv
+  ansible.builtin.shell:
+    cmd: "{{ home }}/.local/bin/uv tool install --python 3.13 posting"
+    creates: "{{ home }}/.local/bin/posting"
+  become: true
+  become_user: "{{ user }}"
