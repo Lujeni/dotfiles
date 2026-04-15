@@ -1,13 +1,14 @@
 - name: system | install base packages
   ansible.builtin.apt:
     name:
+      - bluez
+      - brightnessctl
       - ca-certificates
       - curl
       - gnupg
-      - python3.12-venv
-      - bluez
       - pavucontrol
       - postgresql-client
+      - python3.12-venv
     state: present
     update_cache: yes
     cache_valid_time: 3600
