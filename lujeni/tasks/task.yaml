@@ -1,0 +1,21 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: task | check if task binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/task
+  register: task_binary
+
+- name: task | setup cloudsmith apt repository
+  ansible.builtin.shell: |
+    curl -1sLf 'https://dl.cloudsmith.io/public/task/task/setup.deb.sh' | sudo -E bash
+  args:
+    creates: /etc/apt/sources.list.d/task-task.list
+  when: not task_binary.stat.exists
+
+- name: task | install task package
+  ansible.builtin.apt:
+    name:
+      - task
+    state: present
+    update_cache: yes
+  when: not task_binary.stat.exists

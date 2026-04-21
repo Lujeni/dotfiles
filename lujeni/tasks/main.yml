@@ -73,6 +73,10 @@
   ansible.builtin.import_tasks: posting.yaml
   tags: [posting]
 
+- name: Include task tasks
+  ansible.builtin.import_tasks: task.yaml
+  tags: [task]
+
 - name: Include home tasks
   ansible.builtin.import_tasks: home.yaml
   tags: [home]
