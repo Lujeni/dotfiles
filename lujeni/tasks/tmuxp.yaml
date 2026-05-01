@@ -16,12 +16,20 @@
   ansible.builtin.shell: |
     for base_dir in {{ tmuxp_base_dirs | join(' ') }}; do
       [ -d "$base_dir" ] || continue
+      base_name=$(basename "$base_dir")
+      case "$base_name" in
+        gitlab) prefix=gl ;;
+        github) prefix=gh ;;
+        *) prefix="$base_name" ;;
+      esac
       find "$base_dir" -type d -name .git | while read gitdir; do
-        project=$(dirname "$gitdir")
-        name=$(basename "$project")
+        project_dir=$(dirname "$gitdir")
+        project=$(basename "$project_dir")
+        org=$(basename "$(dirname "$project_dir")")
+        name="${prefix}-${org}-${project}"
         cat > "{{ home }}/.config/tmuxp/${name}.yaml" <<EOF
     session_name: ${name}
-    start_directory: ${project}
+    start_directory: ${project_dir}
     windows:
       - window_name: editor
         panes:
