@@ -77,6 +77,10 @@
   ansible.builtin.import_tasks: task.yaml
   tags: [task]
 
+- name: Include elixir tasks
+  ansible.builtin.import_tasks: elixir.yaml
+  tags: [elixir]
+
 - name: Include home tasks
   ansible.builtin.import_tasks: home.yaml
   tags: [home]

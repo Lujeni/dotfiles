@@ -1,0 +1,17 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: elixir | ensure local bin directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.local/bin"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0755"
+
+- name: elixir | download expert lsp binary
+  ansible.builtin.get_url:
+    url: https://github.com/expert-lsp/expert/releases/download/v0.1.3/expert_linux_amd64
+    dest: "{{ home }}/.local/bin/expert"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0755"
