@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+[default]
+credential_process = gsts --cache-dir /home/chrome/.aws --playwright-engine-executable-path /home/chrome/.cache/ms-playwright/chromium-1045/chrome-linux/chrome --aws-role-arn arn:aws:iam::569381709489:role/AdminWithSAML --aws-region eu-west-3 --sp-id 97839510104 --idp-id C04he5wkr --username julien.thebault@numberly.com --aws-session-duration 43200 --aws-profile default
+
+[profile diva-staging]
+credential_process = gsts --cache-dir /home/chrome/.aws --playwright-engine-executable-path /home/chrome/.cache/ms-playwright/chromium-1045/chrome-linux/chrome --aws-role-arn arn:aws:iam::315989535748:role/AdminWithSAML --aws-region eu-west-3 --sp-id 97839510104 --idp-id C04he5wkr --username julien.thebault@numberly.com --aws-session-duration 43200 --aws-profile diva-staging
+
+[profile diva-production]
+credential_process = gsts --cache-dir /home/chrome/.aws --playwright-engine-executable-path /home/chrome/.cache/ms-playwright/chromium-1045/chrome-linux/chrome --aws-role-arn arn:aws:iam::307361919139:role/AdminWithSAML --aws-region eu-west-3 --sp-id 97839510104 --idp-id C04he5wkr --username julien.thebault@numberly.com --aws-session-duration 43200 --aws-profile diva-production

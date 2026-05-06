@@ -47,6 +47,61 @@
     mode: "0644"
   notify: restart docker
 
+- name: docker | deploy chrome seccomp profile
+  ansible.builtin.template:
+    src: docker/chrome/seccomp.json
+    dest: /etc/docker/seccomp-chrome.json
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: docker | ensure chrome dockerfile directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/docker/dockerfiles/chrome"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: docker | ensure chrome data directories exist
+  ansible.builtin.file:
+    path: "{{ home }}/docker/data/chrome/{{ item }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+  loop:
+    - data
+    - downloads
+
+- name: docker | deploy chrome dockerfile
+  ansible.builtin.template:
+    src: docker/chrome/Dockerfile.j2
+    dest: "{{ home }}/docker/dockerfiles/chrome/Dockerfile"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+  register: chrome_dockerfile
+
+- name: docker | deploy chrome local font config
+  ansible.builtin.template:
+    src: docker/chrome/local.conf
+    dest: "{{ home }}/docker/dockerfiles/chrome/local.conf"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+  register: chrome_local_conf
+
+- name: docker | check if chrome image exists
+  ansible.builtin.command: docker image inspect {{ docker_repo_prefix }}/chrome:{{ docker_images_version }}
+  register: chrome_image
+  changed_when: false
+  failed_when: false
+
+- name: docker | build chrome image
+  ansible.builtin.command: docker build -t {{ docker_repo_prefix }}/chrome:{{ docker_images_version }} {{ home }}/docker/dockerfiles/chrome
+  when: chrome_image.rc != 0 or chrome_dockerfile.changed or chrome_local_conf.changed
+
 - name: docker | add user to docker group
   ansible.builtin.user:
     name: "{{ user }}"

@@ -40,7 +40,7 @@ chrome(){
         --group-add video \
         --memory 2gb \
         --name chrome \
-        --security-opt seccomp:/etc/docker/seccomp-chrome.json \
+        --security-opt seccomp=unconfined \
         -e "DISPLAY=unix${DISPLAY}" \
         -v "${HOME}/docker/data/chrome/data:/home/chrome/data" \
         -v "${HOME}/docker/data/chrome/downloads:/home/chrome/Downloads" \

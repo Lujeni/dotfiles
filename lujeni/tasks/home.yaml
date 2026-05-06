@@ -102,6 +102,22 @@
   vars:
     gitlab_api_token: "{{ gitlab_token.stdout }}"
 
+- name: home | ensure aws config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.aws"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: home | deploy aws gsts config
+  ansible.builtin.template:
+    src: "templates/aws/config.j2"
+    dest: "{{ home }}/.aws/config"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+
 - name: home | install oh-my-posh
   ansible.builtin.shell:
     cmd: curl -s https://ohmyposh.dev/install.sh | bash -s -- -d {{ home }}/.local/bin

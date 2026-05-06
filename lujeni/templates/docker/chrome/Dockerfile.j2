@@ -1,0 +1,47 @@
+# {{ ansible_managed }}
+FROM debian:bullseye
+
+RUN apt-get update && apt-get install -y \
+	apt-transport-https \
+	ca-certificates \
+	curl \
+	gnupg \
+	sudo \
+	curl \
+	hicolor-icon-theme \
+	libcanberra-gtk* \
+	libgl1-mesa-dri \
+	libgl1-mesa-glx \
+	libpango1.0-0 \
+	libpulse0 \
+	libv4l-0 \
+	fonts-symbola \
+	python \
+	pip \
+	--no-install-recommends
+# chrome
+RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list \
+    && apt-get update && apt-get install -y google-chrome-stable --no-install-recommends
+
+# node
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash -
+RUN apt-get update -y && apt-get install -y nodejs
+
+# gsts
+RUN pip install awscli
+RUN npm install --global @jontg/gsts
+RUN npm install --global playwright@1.30
+
+# cleanup
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get purge --auto-remove -y curl
+
+RUN groupadd -g {{ guid }} -r chrome && useradd -u {{ uuid }} -r -g chrome -G audio,video chrome \
+    && mkdir -p /home/chrome/Downloads && mkdir -p /home/chrome/data \
+    && chown -R chrome:chrome /home/chrome
+
+USER chrome
+RUN npx playwright install
+ENTRYPOINT [ "google-chrome" ]
+CMD [ "--user-data-dir=/home/chrome/data" ]

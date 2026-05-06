@@ -40,3 +40,8 @@ alias helm-login='gopass show -o numberly/harbor-api-token | helm registry login
 
 # vault
 alias vault-login='curl -s --request POST --data "{\"password\": \"$(gopass show -o numberly/ldap)\"}" https://vault1.numberly.in:8200/v1/auth/ldap/login/jthe | jq -r .auth.client_token > $HOME/.vault-token && echo "Token saved to ~/.vault-token"'
+
+# aws
+alias aws-numberly='docker exec chrome /bin/bash -c "AWS_PROFILE=default aws sts get-caller-identity"'
+alias aws-diva-staging='docker exec chrome /bin/bash -c "AWS_PROFILE=diva-staging aws sts get-caller-identity"'
+alias aws-diva-production='docker exec chrome /bin/bash -c "AWS_PROFILE=diva-production aws sts get-caller-identity"'
