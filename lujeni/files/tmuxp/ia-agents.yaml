@@ -1,0 +1,12 @@
+session_name: ia-agents
+start_directory: ~/works/ia/agents
+windows:
+  - window_name: agent1
+    panes:
+      - shell_command: []
+  - window_name: agent2
+    panes:
+      - shell_command: []
+  - window_name: agent3
+    panes:
+      - shell_command: []

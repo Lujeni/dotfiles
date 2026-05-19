@@ -24,6 +24,9 @@
       esac
       find "$base_dir" -type d -name .git | while read gitdir; do
         project_dir=$(dirname "$gitdir")
+        case "$project_dir" in
+          {{ home }}/works/ia/agents) continue ;;
+        esac
         project=$(basename "$project_dir")
         org=$(basename "$(dirname "$project_dir")")
         name="${prefix}-${org}-${project}"
@@ -45,3 +48,11 @@
     done
   args:
     executable: /bin/bash
+
+- name: tmuxp | deploy ia-agents config
+  ansible.builtin.copy:
+    src: "files/tmuxp/ia-agents.yaml"
+    dest: "{{ home }}/.config/tmuxp/ia-agents.yaml"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
