@@ -1,0 +1,37 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: ia | ensure claude agents directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.claude/agents"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: ia | deploy claude agents
+  ansible.builtin.copy:
+    src: "files/claude/agents/{{ item }}"
+    dest: "{{ home }}/.claude/agents/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+  loop:
+    - tech-topic-explorer.md
+
+- name: ia | list configured claude marketplaces
+  ansible.builtin.command:
+    cmd: claude plugin marketplace list
+  become: true
+  become_user: "{{ user }}"
+  register: claude_marketplaces
+  changed_when: false
+  failed_when: false
+
+- name: ia | add numberly skills marketplace
+  ansible.builtin.command:
+    cmd: claude plugin marketplace add https://gitlab.numberly.in/numberly/tech/skills.git
+  become: true
+  become_user: "{{ user }}"
+  when: "'gitlab.numberly.in/numberly/tech/skills' not in claude_marketplaces.stdout"
+  register: claude_marketplace_add
+  changed_when: "claude_marketplace_add.rc == 0"
