@@ -17,6 +17,7 @@
     mode: "0644"
   loop:
     - tech-topic-explorer.md
+    - british-phrasing-helper.md
 
 - name: ia | list configured claude marketplaces
   ansible.builtin.command:
@@ -35,3 +36,24 @@
   when: "'gitlab.numberly.in/numberly/tech/skills' not in claude_marketplaces.stdout"
   register: claude_marketplace_add
   changed_when: "claude_marketplace_add.rc == 0"
+
+- name: ia | list installed claude plugins
+  ansible.builtin.command:
+    cmd: claude plugin list
+  become: true
+  become_user: "{{ user }}"
+  register: claude_plugins
+  changed_when: false
+  failed_when: false
+
+- name: ia | install official claude plugins
+  ansible.builtin.command:
+    cmd: "claude plugin install {{ item }}@claude-plugins-official"
+  become: true
+  become_user: "{{ user }}"
+  loop:
+    - code-review
+    - gitlab
+  when: "item + '@claude-plugins-official' not in claude_plugins.stdout"
+  register: claude_plugin_install
+  changed_when: "claude_plugin_install.rc == 0"

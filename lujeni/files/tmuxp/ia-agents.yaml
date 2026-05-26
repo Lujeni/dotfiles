@@ -3,7 +3,8 @@ start_directory: ~/works/ia/agents
 windows:
   - window_name: agent1
     panes:
-      - shell_command: []
+      - shell_command:
+          - claude --agent british-phrasing-helper
   - window_name: agent2
     panes:
       - shell_command: []
