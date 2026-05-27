@@ -53,6 +53,7 @@
   become_user: "{{ user }}"
   loop:
     - code-review
+    - github
     - gitlab
   when: "item + '@claude-plugins-official' not in claude_plugins.stdout"
   register: claude_plugin_install

@@ -57,6 +57,10 @@
   ansible.builtin.import_tasks: gh.yaml
   tags: [gh]
 
+- name: Include glab tasks
+  ansible.builtin.import_tasks: glab.yaml
+  tags: [glab]
+
 - name: Include mssql tasks
   ansible.builtin.import_tasks: mssql.yaml
   tags: [mssql]

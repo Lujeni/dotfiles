@@ -1,0 +1,14 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: glab | check if glab binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/glab
+  register: glab_binary
+
+- name: glab | install glab package
+  ansible.builtin.apt:
+    name:
+      - glab
+    state: present
+    update_cache: yes
+  when: not glab_binary.stat.exists
