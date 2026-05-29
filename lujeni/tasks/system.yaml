@@ -1,6 +1,7 @@
 - name: system | install base packages
   ansible.builtin.apt:
     name:
+      - asciinema
       - bluez
       - brightnessctl
       - ca-certificates
