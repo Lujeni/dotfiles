@@ -13,3 +13,6 @@ export LC_ALL="en_US.UTF-8"
 # yubikey
 export GPG_TTY="$(tty)"
 export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+
+# claude handbook skill
+export OUTLINE_API_KEY="$(gopass show -o numberly/handbook-api-token 2>/dev/null)"
