@@ -37,6 +37,15 @@
   register: claude_marketplace_add
   changed_when: "claude_marketplace_add.rc == 0"
 
+- name: ia | add ponytail marketplace
+  ansible.builtin.command:
+    cmd: claude plugin marketplace add DietrichGebert/ponytail
+  become: true
+  become_user: "{{ user }}"
+  when: "'DietrichGebert/ponytail' not in claude_marketplaces.stdout"
+  register: claude_ponytail_marketplace_add
+  changed_when: "claude_ponytail_marketplace_add.rc == 0"
+
 - name: ia | list installed claude plugins
   ansible.builtin.command:
     cmd: claude plugin list
@@ -58,3 +67,12 @@
   when: "item + '@claude-plugins-official' not in claude_plugins.stdout"
   register: claude_plugin_install
   changed_when: "claude_plugin_install.rc == 0"
+
+- name: ia | install ponytail plugin
+  ansible.builtin.command:
+    cmd: claude plugin install ponytail@ponytail
+  become: true
+  become_user: "{{ user }}"
+  when: "'ponytail@ponytail' not in claude_plugins.stdout"
+  register: claude_ponytail_install
+  changed_when: "claude_ponytail_install.rc == 0"
