@@ -6,6 +6,8 @@
       - brightnessctl
       - ca-certificates
       - curl
+      - dbus-x11
+      - fzf
       - gnupg
       - pavucontrol
       - postgresql-client
