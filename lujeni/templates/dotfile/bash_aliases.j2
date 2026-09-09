@@ -52,3 +52,7 @@ alias vault-login='curl -s --request POST --data "{\"password\": \"$(gopass show
 alias aws-numberly='docker exec chrome /bin/bash -c "AWS_PROFILE=default aws sts get-caller-identity"'
 alias aws-diva-staging='docker exec chrome /bin/bash -c "AWS_PROFILE=diva-staging aws sts get-caller-identity"'
 alias aws-diva-production='docker exec chrome /bin/bash -c "AWS_PROFILE=diva-production aws sts get-caller-identity"'
+
+
+# claude code - modele interne numberly
+alias nclaude='claude --settings $HOME/.claude/numberly.settings.json'

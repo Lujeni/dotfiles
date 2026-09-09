@@ -19,6 +19,14 @@
     - tech-topic-explorer.md
     - british-phrasing-helper.md
 
+- name: ia | deploy numberly model settings
+  ansible.builtin.copy:
+    src: "files/claude/numberly.settings.json"
+    dest: "{{ home }}/.claude/numberly.settings.json"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+
 - name: ia | list configured claude marketplaces
   ansible.builtin.command:
     cmd: claude plugin marketplace list

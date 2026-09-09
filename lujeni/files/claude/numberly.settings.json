@@ -1,0 +1,8 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://coding-assistant.numberly.in",
+    "ANTHROPIC_AUTH_TOKEN": "dummy-key",
+    "ANTHROPIC_MODEL": "numberly-code-assistant",
+    "DISABLE_AUTOUPDATER": "1"
+  }
+}
