@@ -141,17 +141,19 @@
   become: yes
   become_user: "{{ user }}"
 
-- name: home | clone nerd-fonts
-  ansible.builtin.git:
-    repo: https://github.com/ryanoasis/nerd-fonts.git
-    dest: "{{ home }}/nerd-fonts"
-    depth: 1
+- name: home | ensure fonts directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.local/share/fonts"
+    state: directory
+    mode: "0755"
   become: yes
   become_user: "{{ user }}"
 
 - name: home | install nerd-fonts
-  ansible.builtin.command:
-    cmd: "{{ home }}/nerd-fonts/install.sh JetBrainsMono"
+  ansible.builtin.unarchive:
+    src: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+    dest: "{{ home }}/.local/share/fonts"
+    remote_src: yes
     creates: "{{ home }}/.local/share/fonts/JetBrainsMonoNerdFont-Regular.ttf"
   become: yes
   become_user: "{{ user }}"
