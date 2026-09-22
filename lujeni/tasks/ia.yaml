@@ -97,3 +97,31 @@
   when: "'ponytail@ponytail' not in claude_plugins.stdout"
   register: claude_ponytail_install
   changed_when: "claude_ponytail_install.rc == 0"
+
+- name: ia | download claude desktop apt signing key
+  ansible.builtin.get_url:
+    url: https://downloads.claude.ai/claude-desktop/key.asc
+    dest: /usr/share/keyrings/claude-desktop-archive-keyring.asc
+    mode: "0644"
+
+- name: ia | add claude desktop apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/claude-desktop-archive-keyring.asc] https://downloads.claude.ai/claude-desktop/apt/stable stable main"
+    filename: claude-desktop
+    state: present
+
+- name: ia | install claude desktop (cowork)
+  ansible.builtin.apt:
+    name:
+      - claude-desktop
+      - qemu-system-x86
+      - ovmf
+      - virtiofsd
+    state: present
+    update_cache: yes
+
+- name: ia | add user to kvm group for cowork
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: kvm
+    append: yes
