@@ -1,0 +1,29 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v2.0.12/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('MSSQL_CONNECTION_STRING')"
+  },
+  "runtime": {
+    "rest": { "enabled": false },
+    "graphql": { "enabled": false },
+    "mcp": { "enabled": true, "path": "/mcp" },
+    "host": {
+      "authentication": { "provider": "Unauthenticated" },
+      "mode": "production"
+    }
+  },
+  "autoentities": {
+    "all-tables": {
+      "patterns": { "include": [ "%.%" ], "name": "{schema}_{object}" },
+      "template": {
+        "rest": { "enabled": false },
+        "graphql": { "enabled": false },
+        "mcp": { "dml-tools": true }
+      },
+      "permissions": [
+        { "role": "anonymous", "actions": [ { "action": "read" } ] }
+      ]
+    }
+  }
+}

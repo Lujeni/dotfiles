@@ -72,6 +72,7 @@
     - code-review
     - github
     - gitlab
+    - mongodb-atlas
   when: "item + '@claude-plugins-official' not in claude_plugins.stdout"
   register: claude_plugin_install
   changed_when: "claude_plugin_install.rc == 0"
@@ -125,3 +126,56 @@
     name: "{{ user }}"
     groups: kvm
     append: yes
+
+- name: ia | install dotnet sdk (sql mcp server)
+  ansible.builtin.apt:
+    name: dotnet-sdk-8.0
+    state: present
+
+- name: ia | install data api builder cli (dab)
+  ansible.builtin.command:
+    cmd: dotnet tool install --global microsoft.dataapibuilder
+    creates: "{{ home }}/.dotnet/tools/dab"
+  become: true
+  become_user: "{{ user }}"
+  environment:
+    DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    DOTNET_NOLOGO: "1"
+
+- name: ia | ensure dab config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.config/dab"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: ia | deploy sql mcp server config
+  ansible.builtin.copy:
+    src: files/claude/dab-config.json
+    dest: "{{ home }}/.config/dab/dab-config.json"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+
+- name: ia | list configured claude mcp servers
+  ansible.builtin.command:
+    cmd: claude mcp list
+  become: true
+  become_user: "{{ user }}"
+  register: claude_mcp_servers
+  changed_when: false
+  failed_when: false
+
+- name: ia | register sql mcp server in claude
+  ansible.builtin.command:
+    cmd: >-
+      claude mcp add --scope user sql-mcp-server
+      -e ASPNETCORE_URLS=http://127.0.0.1:0 --
+      {{ home }}/.dotnet/tools/dab start --mcp-stdio role:anonymous
+      --LogLevel Error --config {{ home }}/.config/dab/dab-config.json
+  become: true
+  become_user: "{{ user }}"
+  when: "'sql-mcp-server' not in claude_mcp_servers.stdout"
+  register: claude_mcp_add
+  changed_when: "claude_mcp_add.rc == 0"
