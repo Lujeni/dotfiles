@@ -166,45 +166,27 @@
     group: "{{ group }}"
     mode: "0755"
 
-- name: ia | seed default database for sql-crm mcp server
+- name: ia | deploy sql mcp servers sync script
   ansible.builtin.copy:
-    content: "1000Mercis_TrackingCRM\n"
-    dest: "{{ home }}/.config/dab/current_db"
+    src: "files/claude/{{ item }}"
+    dest: "{{ home }}/.config/dab/{{ item }}"
     owner: "{{ user }}"
     group: "{{ group }}"
-    mode: "0644"
-    force: false
-
-- name: ia | list configured claude mcp servers
-  ansible.builtin.command:
-    cmd: claude mcp list
-  become: true
-  become_user: "{{ user }}"
-  register: claude_mcp_servers
-  changed_when: false
-  failed_when: false
-
-- name: ia | remove legacy single-db sql mcp server
-  ansible.builtin.command:
-    cmd: claude mcp remove --scope user sql-mcp-server
-  become: true
-  become_user: "{{ user }}"
-  when: "'sql-mcp-server:' in claude_mcp_servers.stdout"
-  register: claude_mcp_remove
-  changed_when: "claude_mcp_remove.rc == 0"
-
-- name: ia | register sql mcp servers in claude (one per database)
-  ansible.builtin.command:
-    cmd: >-
-      claude mcp add --scope user {{ item.name }} --
-      {{ home }}/.config/dab/mssql-mcp.sh {{ item.db }}
-  become: true
-  become_user: "{{ user }}"
+    mode: "0755"
   loop:
-    - { name: sql-trackingcrm, db: 1000Mercis_TrackingCRM }
-    - { name: sql-bat, db: 1000BAT }
-    - { name: sql-mappli, db: 1000mercis_MAppli }
-    - { name: sql-crm, db: "" }  # db read from ~/.config/dab/current_db
-  when: "item.name + ':' not in claude_mcp_servers.stdout"
-  register: claude_mcp_add
-  changed_when: "claude_mcp_add.rc == 0"
+    - mssql-mcp-sync.sh
+    - servers.conf.example
+
+- name: ia | check sql mcp servers config (unmanaged, see servers.conf.example)
+  ansible.builtin.stat:
+    path: "{{ home }}/.config/dab/servers.conf"
+  register: dab_servers_conf
+
+- name: ia | sync sql mcp servers in claude
+  ansible.builtin.command:
+    cmd: "{{ home }}/.config/dab/mssql-mcp-sync.sh"
+  become: true
+  become_user: "{{ user }}"
+  when: dab_servers_conf.stat.exists
+  register: claude_mcp_sync
+  changed_when: "'CHANGED' in claude_mcp_sync.stdout"
