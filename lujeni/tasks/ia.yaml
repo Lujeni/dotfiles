@@ -158,6 +158,23 @@
     group: "{{ group }}"
     mode: "0644"
 
+- name: ia | deploy sql mcp server wrapper
+  ansible.builtin.copy:
+    src: files/claude/mssql-mcp.sh
+    dest: "{{ home }}/.config/dab/mssql-mcp.sh"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: ia | seed default database for sql-crm mcp server
+  ansible.builtin.copy:
+    content: "1000Mercis_TrackingCRM\n"
+    dest: "{{ home }}/.config/dab/current_db"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+    force: false
+
 - name: ia | list configured claude mcp servers
   ansible.builtin.command:
     cmd: claude mcp list
@@ -167,15 +184,27 @@
   changed_when: false
   failed_when: false
 
-- name: ia | register sql mcp server in claude
+- name: ia | remove legacy single-db sql mcp server
   ansible.builtin.command:
-    cmd: >-
-      claude mcp add --scope user sql-mcp-server
-      -e ASPNETCORE_URLS=http://127.0.0.1:0 --
-      {{ home }}/.dotnet/tools/dab start --mcp-stdio role:anonymous
-      --LogLevel Error --config {{ home }}/.config/dab/dab-config.json
+    cmd: claude mcp remove --scope user sql-mcp-server
   become: true
   become_user: "{{ user }}"
-  when: "'sql-mcp-server' not in claude_mcp_servers.stdout"
+  when: "'sql-mcp-server:' in claude_mcp_servers.stdout"
+  register: claude_mcp_remove
+  changed_when: "claude_mcp_remove.rc == 0"
+
+- name: ia | register sql mcp servers in claude (one per database)
+  ansible.builtin.command:
+    cmd: >-
+      claude mcp add --scope user {{ item.name }} --
+      {{ home }}/.config/dab/mssql-mcp.sh {{ item.db }}
+  become: true
+  become_user: "{{ user }}"
+  loop:
+    - { name: sql-trackingcrm, db: 1000Mercis_TrackingCRM }
+    - { name: sql-bat, db: 1000BAT }
+    - { name: sql-mappli, db: 1000mercis_MAppli }
+    - { name: sql-crm, db: "" }  # db read from ~/.config/dab/current_db
+  when: "item.name + ':' not in claude_mcp_servers.stdout"
   register: claude_mcp_add
   changed_when: "claude_mcp_add.rc == 0"
