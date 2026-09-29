@@ -158,24 +158,35 @@
     group: "{{ group }}"
     mode: "0644"
 
-- name: ia | list configured claude mcp servers
-  ansible.builtin.command:
-    cmd: claude mcp list
-  become: true
-  become_user: "{{ user }}"
-  register: claude_mcp_servers
-  changed_when: false
-  failed_when: false
+- name: ia | deploy sql mcp server wrapper
+  ansible.builtin.copy:
+    src: files/claude/mssql-mcp.sh
+    dest: "{{ home }}/.config/dab/mssql-mcp.sh"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
 
-- name: ia | register sql mcp server in claude
+- name: ia | deploy sql mcp servers sync script
+  ansible.builtin.copy:
+    src: "files/claude/{{ item }}"
+    dest: "{{ home }}/.config/dab/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+  loop:
+    - mssql-mcp-sync.sh
+    - servers.conf.example
+
+- name: ia | check sql mcp servers config (unmanaged, see servers.conf.example)
+  ansible.builtin.stat:
+    path: "{{ home }}/.config/dab/servers.conf"
+  register: dab_servers_conf
+
+- name: ia | sync sql mcp servers in claude
   ansible.builtin.command:
-    cmd: >-
-      claude mcp add --scope user sql-mcp-server
-      -e ASPNETCORE_URLS=http://127.0.0.1:0 --
-      {{ home }}/.dotnet/tools/dab start --mcp-stdio role:anonymous
-      --LogLevel Error --config {{ home }}/.config/dab/dab-config.json
+    cmd: "{{ home }}/.config/dab/mssql-mcp-sync.sh"
   become: true
   become_user: "{{ user }}"
-  when: "'sql-mcp-server' not in claude_mcp_servers.stdout"
-  register: claude_mcp_add
-  changed_when: "claude_mcp_add.rc == 0"
+  when: dab_servers_conf.stat.exists
+  register: claude_mcp_sync
+  changed_when: "'CHANGED' in claude_mcp_sync.stdout"

@@ -1,0 +1,7 @@
+# ~/.config/dab/servers.conf — one dab MCP server per line (chmod 600, not managed)
+# <mcp-name> <database|-> [server]
+#   '-'    : database read from ~/.config/dab/current_db at start
+#   server : optional, defaults to $MSSQL_SERVER from ~/.config/dab/env
+sql-main   MyMainDb
+sql-other  OtherDb    other-sql.example.com
+sql-crm    -
