@@ -38,10 +38,10 @@
 
 - name: ia | add numberly skills marketplace
   ansible.builtin.command:
-    cmd: claude plugin marketplace add https://gitlab.numberly.in/numberly/tech/skills.git
+    cmd: claude plugin marketplace add git@gitlab.numberly.in:numberly/guild-ai-tech/skills.git
   become: true
   become_user: "{{ user }}"
-  when: "'gitlab.numberly.in/numberly/tech/skills' not in claude_marketplaces.stdout"
+  when: "'numberly/guild-ai-tech/skills' not in claude_marketplaces.stdout"
   register: claude_marketplace_add
   changed_when: "claude_marketplace_add.rc == 0"
 
@@ -86,6 +86,9 @@
     - handbook
     - sentry
     - metrics
+    - happily
+    - infrastructure
+    - debug
   when: "item + '@numberly-skills' not in claude_plugins.stdout"
   register: claude_numberly_plugin_install
   changed_when: "claude_numberly_plugin_install.rc == 0"
