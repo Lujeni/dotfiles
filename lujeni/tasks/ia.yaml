@@ -193,3 +193,20 @@
   when: dab_servers_conf.stat.exists
   register: claude_mcp_sync
   changed_when: "'CHANGED' in claude_mcp_sync.stdout"
+
+- name: ia | check kubernetes mcp server
+  ansible.builtin.command:
+    cmd: claude mcp get kubernetes
+  become: true
+  become_user: "{{ user }}"
+  register: claude_mcp_kubernetes
+  changed_when: false
+  failed_when: false
+
+# ponytail: read-only on purpose (prod clusters), drop --read-only if write access is needed
+- name: ia | add kubernetes mcp server
+  ansible.builtin.command:
+    cmd: claude mcp add --scope user kubernetes -- npx -y kubernetes-mcp-server@latest --read-only
+  become: true
+  become_user: "{{ user }}"
+  when: claude_mcp_kubernetes.rc != 0
