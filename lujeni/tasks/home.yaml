@@ -7,6 +7,14 @@
     group: "{{ group }}"
     mode: "0700"
 
+- name: home | ensure ssh config.d directory exists (unmanaged host configs)
+  ansible.builtin.file:
+    path: "{{ home }}/.ssh/config.d"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0700"
+
 - name: home | ensure certificates directory exists
   ansible.builtin.file:
     path: "{{ home }}/certificates"
