@@ -210,3 +210,13 @@
   become: true
   become_user: "{{ user }}"
   when: claude_mcp_kubernetes.rc != 0
+
+- name: ia | install gcx (grafana cli)
+  ansible.builtin.unarchive:
+    src: https://github.com/grafana/gcx/releases/download/v1.3.1/gcx_1.3.1_linux_amd64.tar.gz
+    dest: "{{ home }}/.local/bin"
+    remote_src: yes
+    include: gcx
+    creates: "{{ home }}/.local/bin/gcx"
+  become: yes
+  become_user: "{{ user }}"
