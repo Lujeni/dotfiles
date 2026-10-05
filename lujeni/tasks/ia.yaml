@@ -220,3 +220,36 @@
     creates: "{{ home }}/.local/bin/gcx"
   become: yes
   become_user: "{{ user }}"
+
+- name: ia | ensure mem0 config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.config/mem0"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+# self-hosted mem0: numberly gateway as llm, fastembed on cpu, on-disk qdrant in ~/.local/share/mem0
+- name: ia | deploy mem0 mcp server
+  ansible.builtin.copy:
+    src: files/claude/mem0-mcp.py
+    dest: "{{ home }}/.config/mem0/mem0-mcp.py"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: ia | check mem0 mcp server
+  ansible.builtin.command:
+    cmd: claude mcp get mem0
+  become: true
+  become_user: "{{ user }}"
+  register: claude_mcp_mem0
+  changed_when: false
+  failed_when: false
+
+- name: ia | add mem0 mcp server
+  ansible.builtin.command:
+    cmd: "claude mcp add --scope user mem0 -- {{ home }}/.local/bin/uv run --script {{ home }}/.config/mem0/mem0-mcp.py"
+  become: true
+  become_user: "{{ user }}"
+  when: claude_mcp_mem0.rc != 0
