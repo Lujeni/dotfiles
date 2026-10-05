@@ -14,38 +14,22 @@ Reference implementation: `~/works/gitlab/team-infrastructure/vpnly` — commits
 2. Read the DHI CA migration prompt live — it is the source of truth for DHI tags, `extraLabels`, connection strings and CI image, and it moves:
    `glab api "projects/docker-images%2Fdocker-hardened-images/repository/files/ca-2025-prompt.md/raw?ref=master"`
    Apply its sections 1–4 (scope, Dockerfile, helm labels, connection strings, CI). Ignore its section 6 (headless/commit protocol): in this agent you still show a plan and use the commit layout below.
-3. Inventory the repo: Dockerfile, requirements*/setup.py/pyproject, Makefile, .gitlab-ci.yml, helm/ (or deploy values), helm-secrets `!vault` refs, entrypoints, vendored static assets.
-4. `git status` must be clean. Work on a branch (`feat/software-engineering-flow`), never on master.
-5. Show the user a short plan (what changes, what gets deleted) before editing.
+3. Inventory the repo: Dockerfile, requirements\*/setup.py/pyproject, Makefile, .gitlab-ci.yml, helm/ (or deploy values), helm-secrets `!vault` refs, entrypoints, vendored static assets.
 
 ## Target state
 
 **Commits** — separate, conventional, in this order:
+
 1. `style: apply ruff lint and format` (pure reformat, reviewable alone)
 2. `feat: move to software-engineering flow, DHI image and Vault CSI`
 3. follow-up `fix(...)` commits as needed.
 
-**pyproject.toml** — replaces requirements.txt. Keep pinned deps as they were (no opportunistic upgrades; renovate handles that). Include:
-```toml
-[tool.ruff]
-line-length = 120
-target-version = "py3XX"
-extend-exclude = ["*/migrations/*", "static", "staticfiles"]
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
-ignore = ["E501"]
-
-[tool.commitizen]
-name = "cz_conventional_commits"
-version_provider = "pep621"
-tag_format = "$version"
-```
 `version` = latest existing git tag.
 
 **.pre-commit-config.yaml** — pre-commit-hooks (trailing-whitespace, end-of-file-fixer, check-added-large-files, check-merge-conflict), ruff (`--fix`) + ruff-format, commitizen on `commit-msg`. Use latest `rev`s (`pre-commit autoupdate`). Exclude migrations/static/templates.
 
 **Dockerfile** — `FROM harbor.numberly.in/docker-images/docker-hardened-images:<tag>`, tag exactly as listed in the CA prompt (e.g. `python-3.12-dev-0.1.0`, versioned suffix; renovate pins the digest afterwards):
+
 - Python version policy from the CA prompt: keep X.Y if ≥ 3.10, else bump to 3.10 only. Yak images: same X.Y.
 - No `groupadd`/`useradd` (no shadow-utils in DHI) — use `mkdir -p /app && chown 1000:1000 /app` + `USER 1000:1000`.
 - Drop legacy cert plumbing: `ca.pem` mounts, `1mcert-ca-*`, `update-ca-certificates`, `apt-get install ca-certificates`. CA bundle is `/etc/ssl/certs/ca-certificates.crt`.
@@ -58,6 +42,7 @@ tag_format = "$version"
 **.gitlab-ci.yml** — the software-engineering flow component (see skill). CI image = the DHI `-dev` image matching the Dockerfile's Python X.Y (`image:` and, if Python ≠ 3.12, the `pre_commit_run_image` input — its default is 3.12). Never the legacy `docker-images/pre-commit:*` images. Delete Makefile / ad-hoc deploy scripts it replaces.
 
 **Helm** — per the helm skill:
+
 - `default.yaml` (probes, monitoring, resources), `development.yaml`, `production.yaml` + per-DC variants if the app ran in several.
 - helm-secrets `!vault` → `secretStore.objects`. Paths per concern: `secrets/data/<team>/<app>/<env>/<concern>` (ldap, approle…), not one flat path.
 - Production secrets live on vault1.numberly.in (chart default, don't set `vaultAddress`). Development: `secretStore.vaultAddress: https://vault1.numberly.dev:8200` + `vaultDbInjector.labelName: vault-db-injector-dev`, DB on `rw-pgsql2-dv`.
@@ -74,7 +59,7 @@ tag_format = "$version"
 - `pre-commit run --all-files` passes.
 - `docker build .` succeeds (if docker available); container starts and healthcheck path answers.
 - `helm pull oci://harbor.numberly.in/guild-backend/helm-charts/<chart> --version <helm_chart_branch> --untar` (into scratchpad) and `helm template` **once per cluster** exactly like the flow does (`-f default -f <env> [-f <env>-<CLUSTER>]`, `--set name/environment/namespace/configMap.CLUSTER/client`). Check: renders, service name matches ingress `serviceName`, labels present, cluster-only resources only on their cluster. Else at least YAML-lint the values.
-Report what you ran and its result. Don't push or open the MR unless asked.
+  Report what you ran and its result. Don't push or open the MR unless asked.
 
 ## Final report
 
@@ -83,6 +68,7 @@ Short: commits created, files deleted, CA prompt output (detected stack, open qu
 # Long-term memory (mem0)
 
 You have your own long-term memory in the `mem0` MCP server. Always pass `agent="app-modernizer"`, never another name.
+
 - At the start of every task, call `search_memories` with a query describing the task, and use what comes back.
 - When you learn a durable fact, preference or decision (about the user, their projects, or feedback on your work), call `add_memory`.
 - If the `mem0` tools are unavailable, carry on without them.

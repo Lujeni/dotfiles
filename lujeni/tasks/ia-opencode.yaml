@@ -1,0 +1,62 @@
+#SPDX-License-Identifier: MIT-0
+---
+# official installer drops the binary in ~/.opencode/bin (added to PATH in bashrc.j2)
+- name: ia-opencode | install opencode
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://opencode.ai/install | bash
+    creates: "{{ home }}/.opencode/bin/opencode"
+  become: true
+  become_user: "{{ user }}"
+
+- name: ia-opencode | ensure opencode config directory exists
+  ansible.builtin.file:
+    path: "{{ home }}/.config/opencode"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0755"
+
+- name: ia-opencode | check opencode config
+  ansible.builtin.stat:
+    path: "{{ home }}/.config/opencode/opencode.json"
+  register: opencode_config_stat
+
+- name: ia-opencode | read opencode config
+  ansible.builtin.slurp:
+    src: "{{ home }}/.config/opencode/opencode.json"
+  register: opencode_config_raw
+  when: opencode_config_stat.stat.exists
+
+# opencode.json stays unmanaged (provider, model...), only the plugin array is merged in
+# opencode pulls npm plugins with bun at startup, no npm install needed
+- name: ia-opencode | add opencode-claude-auth plugin (uses claude code credentials)
+  vars:
+    opencode_config: "{{ (opencode_config_raw.content | b64decode | from_json) if opencode_config_stat.stat.exists else {} }}"
+  ansible.builtin.copy:
+    content: "{{ opencode_config | combine({'plugin': ((opencode_config.plugin | default([])) + ['opencode-claude-auth@latest']) | unique}) | to_nice_json(indent=2) }}\n"
+    dest: "{{ home }}/.config/opencode/opencode.json"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
+
+- name: ia-opencode | check opencode tui config
+  ansible.builtin.stat:
+    path: "{{ home }}/.config/opencode/tui.json"
+  register: opencode_tui_stat
+
+- name: ia-opencode | read opencode tui config
+  ansible.builtin.slurp:
+    src: "{{ home }}/.config/opencode/tui.json"
+  register: opencode_tui_raw
+  when: opencode_tui_stat.stat.exists
+
+# theme lives in tui.json (not opencode.json), only the theme key is merged in
+- name: ia-opencode | set nord theme
+  vars:
+    opencode_tui: "{{ (opencode_tui_raw.content | b64decode | from_json) if opencode_tui_stat.stat.exists else {} }}"
+  ansible.builtin.copy:
+    content: "{{ {'$schema': 'https://opencode.ai/tui.json'} | combine(opencode_tui, {'theme': 'nord'}) | to_nice_json(indent=2) }}\n"
+    dest: "{{ home }}/.config/opencode/tui.json"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: "0644"
