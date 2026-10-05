@@ -18,6 +18,8 @@
   loop:
     - tech-topic-explorer.md
     - british-phrasing-helper.md
+    - le-commiter.md
+    - app-modernizer.md
 
 - name: ia | deploy numberly model settings
   ansible.builtin.copy:
