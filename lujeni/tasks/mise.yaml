@@ -38,3 +38,11 @@
   become: true
   become_user: "{{ user }}"
   when: mise_config.changed
+
+- name: mise | install helm-diff plugin
+  ansible.builtin.command: helm plugin install https://github.com/databus23/helm-diff --version v3.9.14
+  become: true
+  become_user: "{{ user }}"
+  register: helm_diff_install
+  failed_when: helm_diff_install.rc != 0 and 'already exists' not in helm_diff_install.stderr
+  changed_when: helm_diff_install.rc == 0
