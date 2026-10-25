@@ -10,6 +10,7 @@ return {
 				"djlsp",
 				"dockerls",
 				"eslint",
+				"expert",
 				"graphql",
 				"helm_ls",
 				"html",
