@@ -44,7 +44,6 @@ chrome(){
         -e "DISPLAY=unix${DISPLAY}" \
         -v "${HOME}/docker/data/chrome/data:/home/chrome/data" \
         -v "${HOME}/docker/data/chrome/downloads:/home/chrome/Downloads" \
-        -v "${HOME}/.aws:/home/chrome/.aws" \
         -v /dev/shm:/dev/shm \
         -v /etc/hosts:/etc/hosts \
         -v /etc/localtime:/etc/localtime:ro \

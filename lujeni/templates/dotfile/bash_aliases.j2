@@ -56,9 +56,8 @@ alias vault-dev-login='export VAULT_ADDR=https://vault.numberly.dev && _t=$(gopa
 alias graylog-login='{ gopass show -o numberly/ldap; echo; } | LDAP_USERNAME=jthe graylog login'
 
 # aws
-alias aws-numberly='docker exec chrome /bin/bash -c "AWS_PROFILE=default aws sts get-caller-identity"'
-alias aws-diva-staging='docker exec chrome /bin/bash -c "AWS_PROFILE=diva-staging aws sts get-caller-identity"'
-alias aws-diva-production='docker exec chrome /bin/bash -c "AWS_PROFILE=diva-production aws sts get-caller-identity"'
+# awsl [profile]: login gsts (navigateur si cache expiré) + whoami
+awsl() { AWS_PROFILE="${1:-default}" aws sts get-caller-identity; }
 
 
 # claude code - modele interne numberly
