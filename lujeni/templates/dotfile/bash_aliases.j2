@@ -48,8 +48,8 @@ alias helm-login='gopass show -o numberly/harbor-api-token | helm registry login
 
 # vault
 # password via stdin (not argv, hidden from ps); token file only written on success
-alias vault-login='export VAULT_ADDR=https://vault1.numberly.in:8200 && _t=$(gopass show -o numberly/ldap | jq -Rs "{password: .}" | curl -sf --data @- "$VAULT_ADDR/v1/auth/ldap/login/jthe" | jq -er .auth.client_token) && echo "$_t" > $HOME/.vault-token && echo "Token saved to ~/.vault-token ($VAULT_ADDR)"; unset _t'
-alias vault-dev-login='export VAULT_ADDR=https://vault.numberly.dev && _t=$(gopass show -o numberly/ldap | jq -Rs "{password: .}" | curl -sf --data @- "$VAULT_ADDR/v1/auth/ldap/login/jthe" | jq -er .auth.client_token) && echo "$_t" > $HOME/.vault-token && echo "Token saved to ~/.vault-token ($VAULT_ADDR)"; unset _t'
+alias vault-login='export VAULT_ADDR=https://vault1.numberly.in:8200 && _t=$(gopass show -o numberly/ldap | jq -Rs "{password: .}" | curl -sf --data @- "$VAULT_ADDR/v1/auth/ldap/login/jthe" | jq -er .auth.client_token) && printf %s "$_t" > $HOME/.vault-token && echo "Token saved to ~/.vault-token ($VAULT_ADDR)"; unset _t'
+alias vault-dev-login='export VAULT_ADDR=https://vault.numberly.dev && _t=$(gopass show -o numberly/ldap | jq -Rs "{password: .}" | curl -sf --data @- "$VAULT_ADDR/v1/auth/ldap/login/jthe" | jq -er .auth.client_token) && printf %s "$_t" > $HOME/.vault-token && echo "Token saved to ~/.vault-token ($VAULT_ADDR)"; unset _t'
 
 # graylog
 # echo: gopass -o has no trailing newline, graylog's `read` would hit EOF and fail under set -e
